@@ -18,3 +18,23 @@ libtool acinclude.m4 aclocal.m4 acocilib.m4 configure stamp-h.in
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ocilib.pc
+
+rpmroot = $(shell grep %_topdir ~/.rpmmacros |sed 's/\%_topdir[ \t]*//g' |sed 's/\%(echo \(.*\))/\1/g')
+SRCS = $(rpmroot)/SOURCES
+SPEC = rpm/$(PACKAGE_NAME).spec
+release = $(shell git describe --long --dirty --tags |cut -d '-' -f 2)
+pkgname = $(PACKAGE_NAME)-$(PACKAGE_VERSION)-$(release)
+tarname = $(pkgname).tar.gz
+
+all: config.h
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+
+$(tarname):
+	git archive --format=tar --prefix=$(PACKAGE_NAME)-$(PACKAGE_VERSION)/ v$(PACKAGE_VERSION) | gzip >$@;
+
+tar: $(tarname)
+
+rpm: $(tarname)
+	cp $(tarname) $(SRCS)/
+	rpmbuild -ba $(SPEC) --define "package_version $(PACKAGE_VERSION)" --define "pack_rel $(release)"
+

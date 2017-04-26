@@ -171,6 +171,14 @@ Custom install options
      Only used if import mode is runtime
 
 
+BUILD RPM
+==========
+requires rpmdevtools , rpmbuild and configured tree (rpmdev-setuptree)
+
+run .configure to get a makefile
+edit rpm/ocilib.spec change '--with-XXX' part to fit your needs
+make rpm
+
 BUILD DEMO
 ==========
 
